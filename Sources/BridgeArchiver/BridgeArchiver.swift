@@ -126,7 +126,7 @@ public class BridgeArchiver {
     
     // -- MARK: Cleanup
     
-    func remove() throws {
+    public func remove() throws {
         guard let _ = self.archive, let archiveURL = self.archiveURL else {
             throw BridgeArchiverError.archiveClosed
         }
@@ -159,8 +159,8 @@ public class BridgeArchiver {
 
 /// Simple manifest entry that uses the serialization format of the Bridge Exporter v1 "info.json" file.
 public struct FileEntry : Codable, Hashable {
-    let filename: String
-    let createdOn: Date
-    let contentType: String?
+    public let filename: String
+    public let createdOn: Date
+    public let contentType: String?
 }
 
