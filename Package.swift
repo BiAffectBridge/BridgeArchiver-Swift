@@ -41,7 +41,7 @@ let package = Package(
             name: "BridgeArchiverTests",
             dependencies: ["BridgeArchiver"],
             resources: [
-                .process("Resources")
+                .process("resources")
             ])
     ]
 )

@@ -124,6 +124,15 @@ public class BridgeArchiver {
         try self.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
     }
     
+    // -- MARK: Cleanup
+    
+    func remove() throws {
+        guard let _ = self.archive, let archiveURL = self.archiveURL else {
+            throw BridgeArchiverError.archiveClosed
+        }
+        try FileManager.default.removeItem(at: archiveURL)
+    }
+    
     // -- MARK: Encrypting
     
     /// Encrypt the archive using the given pem file.
