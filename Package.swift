@@ -7,7 +7,7 @@ let package = Package(
     name: "BridgeArchiver",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_15),
+        .macOS(.v11),
         .watchOS(.v4),
         .tvOS(.v11),
     ],
@@ -22,7 +22,7 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
         .package(name: "CMSSupport",
                  url: "https://github.com/Sage-Bionetworks/CMSSupport.git",
-                 .upToNextMajor(from: "1.2.0")),
+                 .upToNextMajor(from: "1.2.1")),
         .package(name: "ZIPFoundation",
                  url: "https://github.com/weichsel/ZIPFoundation.git",
                  .upToNextMajor(from: "0.9.0"))
@@ -34,7 +34,8 @@ let package = Package(
         .target(
             name: "BridgeArchiver",
             dependencies: [
-                "CMSSupport",
+                // syoung 04/05/2022 https://bugs.swift.org/browse/SR-15196 Cannot build a binary conditionally.
+                .product(name: "CMSSupport", package: "CMSSupport", condition: .when(platforms: [.iOS])),
                 "ZIPFoundation",
             ]),
         .testTarget(
