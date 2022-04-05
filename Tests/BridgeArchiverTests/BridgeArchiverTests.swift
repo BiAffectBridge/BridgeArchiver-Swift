@@ -65,5 +65,3 @@ final class BridgeArchiverTests: XCTestCase {
     }
 }
 
-
-
