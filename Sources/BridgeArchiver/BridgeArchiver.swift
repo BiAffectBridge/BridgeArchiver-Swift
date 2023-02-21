@@ -31,10 +31,7 @@
 
 import Foundation
 import ZIPFoundation
-
-#if canImport(CMSSupport)
-import CMSSupport
-#endif
+import CMSEncryption
 
 public class BridgeArchiver {
 
@@ -65,6 +62,7 @@ public class BridgeArchiver {
         case archiveClosed
         case invalidUTF8String(String)
         case filepathExists(String)
+        case encryptionNotSupported
     }
     
     // -- MARK: Add files
@@ -150,11 +148,10 @@ public class BridgeArchiver {
         }
         let encryptedURL = url ?? archiveURL.appendingPathExtension("encrypted")
         let data = try Data(contentsOf: archiveURL)
-        #if canImport(CMSSupport)
-        let encryptedData = try CMSSupport.cmsEncrypt(data, identityPath: pemPath)
-        #else
-        let encryptedData = data
-        #endif
+        let (encryptedData, encrypted) = try CMSEncryption.cmsEncrypt(data, identityPath: pemPath)
+        if !encrypted {
+            throw BridgeArchiverError.encryptionNotSupported
+        }
         try encryptedData.write(to: encryptedURL)
         try FileManager.default.removeItem(at: archiveURL)
         self.encryptedURL = encryptedURL
