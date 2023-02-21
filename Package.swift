@@ -22,7 +22,7 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
         .package(name: "CMSSupport",
                  url: "https://github.com/Sage-Bionetworks/CMSSupport.git",
-                 .upToNextMajor(from: "1.2.1")),
+                 .upToNextMajor(from: "1.2.3")),
         .package(name: "ZIPFoundation",
                  url: "https://github.com/weichsel/ZIPFoundation.git",
                  .upToNextMajor(from: "0.9.0"))
@@ -35,7 +35,8 @@ let package = Package(
             name: "BridgeArchiver",
             dependencies: [
                 // syoung 04/05/2022 https://bugs.swift.org/browse/SR-15196 Cannot build a binary conditionally.
-                .product(name: "CMSSupport", package: "CMSSupport", condition: .when(platforms: [.iOS])),
+                // syoung 02/21/2022 Update - Xcode 14.3 beta fixes this issue.
+                .product(name: "CMSSupport", package: "CMSSupport"),
                 "ZIPFoundation",
             ]),
         .testTarget(
