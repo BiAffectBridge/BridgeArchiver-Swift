@@ -3,7 +3,7 @@
     "pins": [
       {
         "package": "CMSSupport",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/CMSSupport.git",
+        "repositoryURL": "https://github.com/BiAffectBridge/CMSSupport.git",
         "state": {
           "branch": null,
           "revision": "99ef4bcead679b83ee6b5414fd79992478f6c311",

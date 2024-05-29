@@ -21,7 +21,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(name: "CMSSupport",
-                 url: "https://github.com/Sage-Bionetworks/CMSSupport.git",
+                 url: "https://github.com/BiAffectBridge/CMSSupport.git",
                  .upToNextMajor(from: "1.2.3")),
         .package(name: "ZIPFoundation",
                  url: "https://github.com/weichsel/ZIPFoundation.git",
