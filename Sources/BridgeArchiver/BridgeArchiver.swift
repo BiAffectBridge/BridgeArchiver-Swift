@@ -133,5 +133,11 @@ public struct FileEntry : Codable, Hashable, Sendable {
     public let filename: String
     public let createdOn: Date
     public let contentType: String?
+
+    public init(filename: String, createdOn: Date, contentType: String?) {
+        self.filename = filename
+        self.createdOn = createdOn
+        self.contentType = contentType
+    }
 }
 
