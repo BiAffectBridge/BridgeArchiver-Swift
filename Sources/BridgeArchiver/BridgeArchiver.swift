@@ -1,41 +1,8 @@
-// BridgeArchiver.swift
-//
-//  Copyright © 2021 Sage Bionetworks. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// 1.  Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-//
-// 2.  Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// 3.  Neither the name of the copyright holder(s) nor the names of any contributors
-// may be used to endorse or promote products derived from this software without
-// specific prior written permission. No license is granted to the trademarks of
-// the copyright holders even if such marks are included in this software.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-
 import Foundation
 import ZIPFoundation
-import CMSEncryption
 
-public class BridgeArchiver {
-
-    var archive: Archive?
+public actor BridgeArchiver {
+    private var archive: Archive?
     
     /// The URL to the unencrypted archive.
     public private(set) var archiveURL: URL?
@@ -46,15 +13,15 @@ public class BridgeArchiver {
     /// A list of the files included in the archive.
     public private(set) var files: [FileEntry] = []
     
+    /// Has the archive been completed and stored?
+    public var isComplete: Bool { archive == nil }
+    
     /// Initialize the archiver.
     /// - parameters:
     ///     - archiveURL: The URL for the zip archive to create. If null, then a UUID will be used to create a unique file in the temporary directory.
-    public init?(archiveURL: URL? = nil) {
+    public init(archiveURL: URL? = nil) throws {
         let url = archiveURL ?? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("\(UUID().uuidString.suffix(8)).zip")
-        guard let archive = Archive(url: url, accessMode: .create) else  {
-            return nil
-        }
-        self.archive = archive
+        self.archive = try Archive(url: url, accessMode: .create, pathEncoding: nil)
         self.archiveURL = url
     }
     
@@ -102,10 +69,10 @@ public class BridgeArchiver {
         }
         try archive.addEntry(with: filepath,
                              type: .file,
-                             uncompressedSize: UInt32(data.count),
+                             uncompressedSize: Int64(data.count),
                              modificationDate: createdOn,
                              provider: { (position, size) -> Data in
-            data.subdata(in: position..<position+size)
+            data.subdata(in: Int(position)..<Int(position)+size)
         })
         files.append(FileEntry(filename: filepath,
                                createdOn: createdOn,
@@ -162,9 +129,15 @@ public class BridgeArchiver {
 }
 
 /// Simple manifest entry that uses the serialization format of the Bridge Exporter v1 "info.json" file.
-public struct FileEntry : Codable, Hashable {
+public struct FileEntry : Codable, Hashable, Sendable {
     public let filename: String
     public let createdOn: Date
     public let contentType: String?
+
+    public init(filename: String, createdOn: Date, contentType: String?) {
+        self.filename = filename
+        self.createdOn = createdOn
+        self.contentType = contentType
+    }
 }
 
